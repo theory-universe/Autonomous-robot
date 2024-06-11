@@ -1,0 +1,18 @@
+# Overlay Development Image for TurtleBot3 Simulation
+FROM turtlebot3_base:latest
+
+# Create an overlay Catkin workspace
+RUN source /opt/ros/noetic/setup.bash \
+ && mkdir -p /overlay_ws/src \
+ && cd /overlay_ws \ 
+ && catkin_init_workspace
+COPY ./prog_nav/ /overlay_ws/src/prog_nav/
+RUN source /opt/ros/noetic/setup.bash \
+ && cd /overlay_ws \
+ && catkin config --extend /turtlebot3_ws/devel \
+ && catkin build
+
+# Set up the work directory and entrypoint
+WORKDIR /overlay_ws
+COPY ./docker/entrypoint.sh /
+ENTRYPOINT [ "/entrypoint.sh" ]
